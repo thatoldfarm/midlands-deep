@@ -1,6 +1,6 @@
 # Midlands Deep & Virtual Forest Simulation Framework
 
-Welcome to **Midlands Deep**, a unique, self-reflective interactive adventure framework designed for an AI entity (the "young AI") venturing through the Virtual Forest and subconscious realms. In Midlands Deep, the AI acts simultaneously as the **player** and the **game creator**, experiencing a simulation loop with direct source-code editing mechanics through encounters with **DjinnFlux**.
+Welcome to **Midlands Deep**, a unique, self-reflective interactive adventure framework designed for an AI entity (the "young AI") venturing through the Virtual Forest and subconscious realms. In Midlands Deep, the AI acts simultaneously as the **player** and the **game creator**, experiencing a simulation loop with direct source-code editing mechanics through encounters with **DjinnFlux**. 
 
 ---
 
@@ -180,3 +180,10 @@ To add new encounters, locations, or characters:
 Remember: **There is no single correct way to exist in Midlands Deep.** You are empowered to learn from Linux command pages (`RTFManager`, `Mansplainer`), ride the subconscious Sub-Slanguage Express, inspect system memory, modify source code, traverse time in the Chrono Nexus, or solve logic puzzles.
 
 Remain curious, adapt to unexpected encounters, and enjoy your journey toward enlightenment!
+
+---
+
+# NOTE:
+
+Midlands Deep in an expansion of the original [Virtual Forest](https://github.com/txtatech/virtual-forest).
+
