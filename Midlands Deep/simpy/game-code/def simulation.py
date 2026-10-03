@@ -180,8 +180,8 @@ class Impact:
         else:
             self.power -= 3
 
-        # Ensure power level does not go below 0 or above 999
-        self.power = max(0, min(self.power, 999))
+        # Ensure power level does not go below 0 or above 5555
+        self.power = max(0, min(self.power, 5555))
 
     def get_power_level(self):
         return self.power

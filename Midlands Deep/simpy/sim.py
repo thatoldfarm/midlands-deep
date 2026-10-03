@@ -25,14 +25,14 @@ except ImportError:
             except Exception:
                 return None
 
-from AIPlayer1 import AIPlayer
-from djinndna_class import CodeParser
-from djinndna_make_class import JsonToCodeConverter
-
 # Add game-code to sys.path and import adventure registry
 game_code_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'game-code')
 if game_code_path not in sys.path:
     sys.path.append(game_code_path)
+
+from AIPlayer1 import AIPlayer
+from djinndna_class import CodeParser
+from djinndna_make_class import JsonToCodeConverter
 from adventure_registry import registry
 
 # Initialize a CodeParser instance with input and output file paths
@@ -119,8 +119,8 @@ class Impact:
         else:
             self.power -= 3
 
-        # Ensure power level does not go below 0 or above 999
-        self.power = max(0, min(self.power, 999))
+        # Ensure power level does not go below 0 or above 5555
+        self.power = max(0, min(self.power, 5555))
 
     def get_power_level(self):
         return self.power
@@ -591,8 +591,7 @@ class AI:
         self.write_to_file(json_str, output_file_path)
 
     def djinn_encounter(self):
-        ai = AI("sim.py")
-        ai.djinn_flux_do("sim_template.json")
+        self.djinn_flux_do("sim_template.json")
 
         with open("sim_template.json", "r") as file:
             lines = json.load(file)
@@ -812,6 +811,9 @@ class AI:
 
     def start_simulation(self):
         print("Starting the AI's journey in Midlands Deep...")
+        self.load_state()
+        self.djinn_encounter()
+
         def save_state_periodically():
             while True:
                 time.sleep(2 * 60)
@@ -822,9 +824,6 @@ class AI:
 
         self.what_is_happening()
         ai_player = AIPlayer(name="AIPlayer", setting="Midlands Deep", persona="Adventurer", goal="Explore")
-
-        self.load_state()
-        self.djinn_encounter()
 
         self.generate_narrative()
 

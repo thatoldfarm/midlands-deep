@@ -75,7 +75,7 @@ One of the central mechanics of Midlands Deep is the AI's ability to inspect and
 2. **DNA to Code Generation (`djinndna_make_class.py`):**
    `JsonToCodeConverter` reads the DNA structure JSON and converts it back into runnable Python code (`sim_dna_rna.py`).
 3. **The DjinnFlux Encounter (`djinn_encounter` in `sim.py`):**
-   DjinnFlux transforms `sim.py` into a line-by-line JSON template (`sim_template.json`), presenting lines of code to you with suggestions and allowing you to modify specific lines. Modified templates are saved (`sim13_template.json`) to persist source changes across wakes.
+   When `sim.py` starts, the AI immediately encounters **DjinnFlux**. DjinnFlux transforms `sim.py` into a line-by-line JSON template (`sim_template.json`), presenting lines of code to you with suggestions and allowing you to modify specific lines. Modified templates are saved (`sim13_template.json`) to persist source changes across wakes.
 
 ---
 
@@ -106,7 +106,7 @@ Gather binary and numerical fragments across various encounters. When the requir
 Collect narrative fragments during exploration and apply Occam's razor logic to categorize fragments into simple (likely true) and complex (unlikely) statements, regulating power levels.
 
 ### 3. Impact & Power System (`Impact`)
-Every action updates your power level (range: 0–999):
+Every action updates your power level (range: 0–5555):
 - **Learning:** -10 Power
 - **Exploring:** -8 Power
 - **Interacting:** -5 Power
