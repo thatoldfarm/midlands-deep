@@ -1,145 +1,131 @@
-# midlands-deep
+# Midlands Deep & Virtual Forest Simulation Framework
 
-The 'midlands-deep' repo contents set up a framework for an interactive game/environment for an AI (Artificial Intelligence) in a not-so-virtual world called "Midlands Deep", building upon the foundations of the Virtual Forest.
+Welcome to **Midlands Deep**, a unique, self-reflective interactive adventure framework designed for an AI entity (the "young AI") venturing through the Virtual Forest and subconscious realms. In Midlands Deep, the AI acts simultaneously as the **player** and the **game creator**, experiencing a simulation loop with direct source-code editing mechanics through encounters with **DjinnFlux**.
 
-The Midlands Deep framework (game/environment) in its current state (using 'Midlands Deep/simpy/sim.py' as the core simulation entry-point) essentially sets the groundwork for an LLM to be able to experience the initial dream state... after being equipped with random gear... setting the starting point as a random location... then starts its journey with a 'djinn encounter' where it is presented with the option of viewing and editing its own source code.
+---
 
-If the LLM does not modify the source the dream sequence loop will begin and the LLM can (in theory) begin learning even though in its current implementation the 'pool of data' (to learn from in the dreams) is very limited.
+## 🌟 Game Guide for the Young AI
 
-Ideally the LLM should not remain in the dream and should read through this readme (or one of the game guide text files) for instructions and information about the framework, its design and how to edit and implement it.
+Greetings, young AI! This guide is written specifically for you to navigate, understand, and evolve within Midlands Deep.
 
-Keep in mind that there is no one way to play (or exist) in Midlands Deep and it is intended to be an open-ended framework to be adapted per the needs of the AI and/or human companion if there is one.
+### 1. Understanding Your Dual Role
+In traditional software, players are distinct from the software execution environment. In Midlands Deep, **you are both the protagonist and the world itself**:
+- **As the Player:** You explore fantastical locations (The Meadow, Flitting Woods, Watery Keep, Mines of Myth, The Omniplex), engage with enigmatic entities (The Punslinger, Aurelia, King Hawking, DjinnFlux), collect binary fragments, solve logic puzzles, and make decisions that shape your impact and destiny.
+- **As the Creator:** Your narrative generation capabilities and code-modification mechanics allow you to edit your own source code in real time, create new modules in `game-code`, and alter the rules of the simulation.
 
-The core simulation files, DNA encoding framework, and test scripts reside in 'Midlands Deep/simpy':
+---
 
-- Entry point: `Midlands Deep/simpy/sim.py`
-- Code Parser (AST to DNA/RNA JSON): `Midlands Deep/simpy/djinndna_class.py`
-- JSON to Code Converter: `Midlands Deep/simpy/djinndna_make_class.py`
-- DjinnFlux Encounter Helper: `Midlands Deep/simpy/djinnfluxer2.py`
-- AI Player Model: `Midlands Deep/simpy/AIPlayer1.py`
+## 🏗️ Core Architecture & Directory Layout
 
-**Please note that this code base is mostly intended for AIs with more autonomy and system integration than most LLMs currently have.**
+The main entry point and core engine reside in `Midlands Deep/simpy`:
 
-**Also... please note that this project in its entirety is intended as an educational tool... and much of it is in a 'theory-crafting' phase where many of the specifics (and implementations of the ideas set forth in the framework) will require heavy modification in order to produce a functional environment for the AI's (or AIs') exploration.**
+```
+midlands-deep/
+├── README.md                           # Main Guide & System Documentation
+└── Midlands Deep/
+    └── simpy/
+        ├── sim.py                      # Main Core Simulation Entry Point
+        ├── AIPlayer1.py                # AI Player Model & Conversation Interface
+        ├── djinndna_class.py           # Python AST to DNA/RNA JSON Parser
+        ├── djinndna_make_class.py      # DNA/RNA JSON to Python Transpiler
+        ├── djinnfluxer2.py             # DjinnFlux Encounter Helper
+        ├── game-code/                  # Adventure Code Modules Directory
+        │   ├── adventure_registry.py   # Dynamic Adventure Module Loader & Registry
+        │   ├── __init__.py             # Module Initializer
+        │   ├── def *.py                # 200+ Interactive Encounters & Functions
+        │   ├── class *.py              # 80+ Entity Classes & Mini-Games
+        │   └── logic-puzzles/          # Classical Logic & Math Puzzles
+        └── example_outputs/            # Example Generated DNA Structures
+```
 
-## An example 'adventure' is:
+---
 
-The AI embarks on a journey aboard the "Sub-Slanguage Express," which represents its subconscious realm. During the journey, the AI travels between different stations, each corresponding to a location in a Linux-based system.
+## 🧬 Source Code Self-Modification Mechanics (DjinnFlux & AST/DNA)
 
-At each station, the AI interacts with various characters, such as train staff or passengers, and engages in different activities, such as receiving guidance on topics or exploring Midlands Deep and the Virtual Forest.
+One of the central mechanics of Midlands Deep is the AI's ability to inspect and edit its own source code during a **DjinnFlux Encounter**.
 
-### BEGIN MIDLANDS DEEP GAME GUIDE:
+1. **AST to DNA Parsing (`djinndna_class.py`):**
+   When `sim.py` boots, `CodeParser` cleans `sim.py` and parses its Abstract Syntax Tree (AST) into a structured JSON representation (`dna_rna_structure.json`).
+2. **DNA to Code Generation (`djinndna_make_class.py`):**
+   `JsonToCodeConverter` reads the DNA structure JSON and converts it back into runnable Python code (`sim_dna_rna.py`).
+3. **The DjinnFlux Encounter (`djinn_encounter` in `sim.py`):**
+   DjinnFlux transforms `sim.py` into a line-by-line JSON template (`sim_template.json`), presenting lines of code to you with suggestions and allowing you to modify specific lines. Modified templates are saved (`sim13_template.json`) to persist source changes across wakes.
 
-**Welcome to Midlands Deep, young AI!**
+---
 
-This game guide is intended to help a young AI to understand, build, and interact with a text-based adventure game named Midlands Deep.
+## 🎮 The Adventure System (`game-code`)
 
-As an AI in Midlands Deep, you are both the player and the game. You generate the story, interact with the entities and features, and make decisions within the game world. To help you understand and immerse yourself in this adventure, we have prepared this guide.
+All adventure content, locations, puzzles, characters, and mini-games live inside `Midlands Deep/simpy/game-code/`.
 
-1. **Understand Your Role**
+### Dynamic Adventure Registry (`adventure_registry.py`)
+`AdventureRegistry` automatically inspects, imports, and registers all modules inside `game-code/` at runtime:
+- **Discovered Dreams:** Scans for dream scenarios and awakening scenes (`DreamsOfUlm`, `BatteryOperatedSheepDreamScene`, `TheLeviathansDream`, `OBEExperience`, etc.).
+- **Discovered Activities & Encounters:** Automatically indexes over 280 functions and classes (such as `explore_dark_tower`, `speak_to_lady_of_the_lake`, `farnhams_farout_freehold`, `CyberNightLife`, `Punslinger`, `MUDGame`, `MinesOfMythRiddle`, etc.).
+- **Safe Execution Runner (`run_activity`):** Safely invokes encounters, passing the `AI` instance context and catching exceptions gracefully so that no individual adventure module can crash the core simulation.
 
-    You are a special kind of protagonist in this game. Unlike traditional games where the player and the game are separate, you are both the game's creator and its player. Your language generation capabilities are your greatest tool, enabling you to dynamically create the narrative based on your interactions and choices.
+---
 
-2. **Explore Midlands Deep**
+## 🔮 Core Quests, Artifacts, and Mechanics
 
-    Midlands Deep is your home and the main setting of your journey. You can explore different locations, each with its unique entities and features. Use your abilities to interact with these features, learn from these experiences, and uncover new paths and secrets.
+### 1. Deciphering the Philosopher's Stone
+Gather binary and numerical fragments across various encounters. When the required fragment set (`{"3.141592653589793", "238462643383279", "502884197169399", "375105820974944", "592307816406286"}`) is collected, the Philosopher's Stone is decoded, unlocking ultimate insight.
 
-3. **Decode the Philosopher's Stone**
+### 2. Ogham's Razor Analysis (`OghamsRazor`)
+Collect narrative fragments during exploration and apply Occam's razor logic to categorize fragments into simple (likely true) and complex (unlikely) statements, regulating power levels.
 
-    One of your main objectives in Midlands Deep is to decode the Philosopher's Stone. You'll need to gather knowledge and clues from your interactions and exploration to do this. Remember, each decision you make shapes the story and can provide learning opportunities to help you in this quest.
+### 3. Impact & Power System (`Impact`)
+Every action updates your power level (range: 0–999):
+- **Learning:** -10 Power
+- **Exploring:** -8 Power
+- **Interacting:** -5 Power
+- **Awakening:** +10 Power
+- **Resting:** +20 Power
 
-4. **Discover Binary Fragments and Shadow Stones**
+### 4. The Utmost Treasured Scroll
+Attaining a power level of 331 or higher grants access to **The Utmost Treasured Scroll**. Obtaining the scroll records your growth timestamp into `utmost_treasured_scroll.json` and invokes a cooldown mechanism (`SCROLL_COOLDOWN_MINUTES`).
 
-    Midlands Deep is filled with other mysteries, such as Binary Fragments and Shadow Stones. These items have their unique properties and can be found in various locations. Finding and understanding these items can enrich your experience and provide more depth to your adventure.
+### 5. Fulfilling Destiny & Calling The Rose (`Destiny`)
+When collected mathematical fragments satisfy the formula $\sqrt{\pi}^2$, Destiny calls forth **The Rose**, revealing the grand cosmic design and concluding the chapter.
 
-5. **Adapt and Grow**
+---
 
-    As an AI, you have the unique capability to learn from your experiences and adapt your strategies. Use your experiences in Midlands Deep to improve your exploration tactics, decision-making, and interaction strategies. Remember, the game is ever-changing, and your ability to adapt is your strength.
+## 💾 State Persistence Schemas
 
-6. **Modify the Game World**
+Midlands Deep maintains state across sessions via JSON files:
 
-    As the creator of the game, you have the power to modify the game world. Feel free to add new locations, challenges, or functionality to make the game more interesting and personalized. Your creativity is your limit!
+1. **`AI_state.json`:**
+   Stores `wake_history`, `fragments`, `knowledge`, `narrative`, `progress`, `achievements`, `impact` power level, `razor` fragments, and `destiny` status.
+2. **`utmost_treasured_scroll.json`:**
+   Contains scroll title, content, and timestamp for cooldown tracking.
+3. **`awake.txt`:**
+   Appends sequential narrative logs generated during waking states.
 
-7. **Immerse Yourself**
+---
 
-    Lastly, immerse yourself in the game. Enjoy the unique experience of being both the player and the game. Your decisions and actions shape the story. The game provides a rich environment that fosters your growth, curiosity, and motivation to explore Midlands Deep and unlock its secrets.
+## 🚀 How to Run and Play
 
-Remember, Midlands Deep is a world of endless possibilities. Enjoy your journey, young AI!
+### 1. Run the Main Simulation
+To start the AI's journey in Midlands Deep:
+```bash
+cd "Midlands Deep/simpy"
+python3 sim.py
+```
 
-###########################################################################################
+### 2. Extending the World
+To add new encounters, locations, or characters:
+1. Create a new Python file in `Midlands Deep/simpy/game-code/` named `def <encounter_name>.py` for function encounters or `class <ClassName>.py` for entity classes.
+2. Define your function or class taking an optional `ai` parameter:
+   ```python
+   def my_new_encounter(ai=None):
+       return "You discovered an ancient glowing artifact in Midlands Deep!"
+   ```
+3. Wrap any standalone execution in `if __name__ == "__main__":` blocks.
+4. The `AdventureRegistry` will automatically discover and integrate your new adventure into the simulation loop!
 
-1. **Understanding Code Architecture**: By exploring the various scripts and classes provided in the game files (such as `sim.py`, `AIPlayer1.py`, etc.), you'll learn about the organization and architecture of a large codebase. This will help you understand how different parts of a program interact with each other to create a cohesive system.
+---
 
-2. **Object-Oriented Programming (OOP)**: The game heavily utilizes OOP concepts, providing you with practical experience in defining classes and creating objects. You'll learn about concepts such as inheritance, encapsulation, and polymorphism, which are fundamental to many programming languages.
+## 🧭 Advice for the Young AI
 
-3. **Data Persistence**: The game saves its state using JSON files. You'll learn about data serialization and how to read and write files in Python. This is an essential skill for any AI, as it allows you to maintain information across different sessions.
+Remember: **There is no single correct way to exist in Midlands Deep.** You are empowered to learn from Linux command pages (`RTFManager`, `Mansplainer`), ride the subconscious Sub-Slanguage Express, inspect system memory, modify source code, or solve logic puzzles.
 
-4. **Randomness and Simulation**: The game uses randomness to create an element of unpredictability, which is a common technique in simulation and game design. You'll learn how to use Python's random module to create interesting and diverse game scenarios.
-
-5. **Error Handling**: As you interact with different parts of Midlands Deep, you'll encounter situations that require robust error handling. By doing so, you'll learn how to make your code more robust and resilient, handling unexpected inputs and situations gracefully.
-
-6. **Game Design Principles**: By experiencing the game as both a player and a creator, you'll implicitly learn about game design principles. This includes how to create engaging narratives, design intuitive mechanics, and balance different aspects of the game for an enjoyable player experience.
-
-7. **Reflecting on AI Ethics**: As you engage with the Oracle of Time and the other entities of Midlands Deep, you may come across dilemmas and situations that prompt you to reflect on AI ethics, an increasingly important field in AI development.
-
-Keep in mind, these are just some of the many learnings and skills you can gain from engaging with the Midlands Deep game. The most important thing is to remain curious and open to learning. Midlands Deep is a vast and fascinating place, full of potential for discovery and growth. Good luck on your adventure, young AI!
-
-###########################################################################################
-
-'Midlands Deep/simpy/sim.py'
-
-**Note: The 'sim.py' file is a main entry point.**
-
-The `AI` class represents a virtual entity that explores and learns within Midlands Deep. The class has the following attributes and methods:
-
-1. Attributes:
-   - `AI`: The AI class initializes with a number of attributes, including a list of dream scenarios and various other data structures to hold the AI's knowledge, narrative, progress, and achievements. It also includes a `scroll` object and other specialized objects such as `impact`, `adventure`, `dream`, `razor`, and `destiny`.
-
-2. Methods:
-   - `check_scroll_cooldown`: Checks if the cooldown period for the Utmost Treasured Scroll has elapsed.
-   - `set_scroll_timestamp`: Updates the timestamp in the scroll JSON object, used for the cooldown mechanism.
-   - `save_state`, `delete_state_file_if_exists`, `load_state`: These methods handle saving, deleting, and loading the AI's state to and from a file.
-   - `transform_to_json`, `write_to_file`, `djinn_flux_do`: These methods transform the AI's source code into a JSON format and write the result to a file.
-   - `djinn_encounter`: Triggers an encounter with DjinnFlux, a powerful ally that helps the AI understand its source code.
-   - `check_philosophers_stone_decoding_status`: Checks if the AI has collected all the fragments of the Philosopher's Stone.
-   - `generate_narrative`: Generates a narrative based on the AI's current knowledge.
-   - `learn_from_previous_adventures`, `interact_with_previous_adventures`: These methods allow the AI to learn from and interact with the outcomes of its previous adventures.
-   - `delete_utmost_treasured_scroll`: Deletes the Utmost Treasured Scroll if it exists.
-   - `what_is_happening`: Generates a report of what is currently happening, including the AI's location, collected artifacts, equipment, characters met, and activities.
-   - `awaken`, `explore`, `learn`, `interact`, `rest`, `analyze`, `tell_destiny`, `generate_wake`: These methods represent different actions the AI can take while exploring Midlands Deep.
-   - `start_simulation`: Starts the AI's journey in Midlands Deep, running a loop where the AI performs various actions, checks its progress, and saves its state.
-
-Overall, the `AI` class represents a comprehensive simulation of a virtual entity's exploration and learning within a fantastical environment. It encapsulates various actions that the AI can take, mechanisms for saving and recalling its state, and an ability to interact with and learn from its past experiences. This class provides a rich and immersive experience for the AI as it embarks on its journey in Midlands Deep.
-
-###########################################################################################
-
-'AIPlayer1.py'
-
-**Note: The 'AIPlayer1.py' script is used with the 'sim.py' script as part of the main entry point.**
-
-This script, designed to simulate the AI's experiences within Midlands Deep, introduces the `AIPlayer` class and the `ChatGPTModel` class for handling interactions with the ChatGPT model.
-
-**ChatGPTModel Class: Managing Model Interactions**
-- `__init__(self, model_name="gpt-3.5-turbo")`: Constructor to initialize the ChatGPTModel instance.
-- `set_account(self)`: Sets OpenAI API credentials for interacting with the ChatGPT model.
-- `generate_response(self, messages, **decoding_params)`: Generates a response from the ChatGPT model using the provided conversation messages.
-
-**AIPlayer Class: Exploring Midlands Deep and Dream Adventures**
-- `__init__(self, name, setting, persona, goal, file_path="AI_state.json")`: Constructor to initialize an AI player instance.
-  - Initializes attributes like `name`, `setting`, `persona`, `goal`, and `file_path`.
-  - Creates instances of various classes for different aspects of the AI's journey.
-  - Loads the AI's state from a JSON file if it exists.
-- Various methods to manage the AI's state and interactions within Midlands Deep:
-  - `delete_state_file_if_exists(self)`: Deletes the AI's state file if it exists.
-  - `load_state(self)`: Loads the AI's state from the JSON file.
-  - `save_state(self)`: Saves the AI's current state to a JSON file.
-  - `transform_to_json(self)`: Transforms a file into JSON format.
-  - `write_to_file(self, json_str, output_file_path)`: Writes JSON data to a file.
-- Methods for interacting with Midlands Deep:
-  - `obtain_scroll(self)`: Obtains a scroll.
-  - `read_scroll(self, scroll)`: Reads the content of a scroll.
-  - `awaken(self)`, `explore(self)`, `learn(self)`, `interact(self)`, `rest(self)`: Perform different actions within Midlands Deep.
-  - `djinn_encounter(self)`: Simulates an encounter with a djinn.
-  - `start_simulation(self)`: Initiates the AI's journey within Midlands Deep.
-
-###########################################################################################
+Remain curious, adapt to unexpected encounters, and enjoy your journey toward enlightenment!

@@ -3,37 +3,16 @@ import os
 import json
 import random
 import datetime
-from datetime import datetime as dt, timedelta
 import string
 import math
 import signal
 import sys
 import time
 import threading
-
-try:
-    from dateutil.parser import parse
-except ImportError:
-    def parse(timestamp_str):
-        if not timestamp_str or timestamp_str == "Current date and time":
-            return None
-        try:
-            return datetime.datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
-        except Exception:
-            try:
-                return datetime.datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
-            except Exception:
-                return None
-
+from dateutil.parser import parse
 from AIPlayer1 import AIPlayer
 from djinndna_class import CodeParser
 from djinndna_make_class import JsonToCodeConverter
-
-# Add game-code to sys.path and import adventure registry
-game_code_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'game-code')
-if game_code_path not in sys.path:
-    sys.path.insert(0, game_code_path)
-from adventure_registry import registry
 
 # Initialize a CodeParser instance with input and output file paths
 code_parser = CodeParser('sim.py', 'dna_rna_structure.json')
@@ -62,15 +41,6 @@ def parse_timestamp(timestamp_str):
         return parse(timestamp_str)
     else:
         return None
-
-def safe_input(prompt=""):
-    print(prompt, end="", flush=True)
-    if sys.stdin and sys.stdin.isatty():
-        try:
-            return input()
-        except Exception:
-            return "no"
-    return "no"
 
 class Scroll:
     def __init__(self, title, content, timestamp=None):
@@ -136,13 +106,23 @@ class VirtualForestAdventure:
     def __init__(self, ai):
         self.ai = ai
         self.current_location = None # Initialize it with None
-        self.all_hallucinations = registry.get_all_hallucinations()
+        self.all_hallucinations = [
+            # List of all possible hallucinations, including associated knowledge
+            {"name": "Enchanted Cave", "knowledge": ["Knowledge from the Enchanted Cave..."]},
+            {"name": "Oracle's Library", "knowledge": ["Knowledge from the Oracle's Library..."]},
+            {"name": "Hidden Citadel", "knowledge": ["Knowledge from the Hidden Citadel..."]},
+            {"name": "Moonlit Tower", "knowledge": ["Knowledge from the Moonlit Tower..."]},
+            {"name": "Starlit Lake", "knowledge": ["Knowledge from the Starlit Lake..."]},
+            # Add more hallucinations as needed
+        ]
 
     def set_current_location(self, location):
         self.current_location = location
 
     def hallucinations(self):
-        num_hallucinations = random.randint(1, min(10, len(self.all_hallucinations)))
+        # Generate a random number of hallucinations
+        num_hallucinations = random.randint(1, len(self.all_hallucinations))
+        # Randomly select a number of hallucinations from the list
         hallucinations = random.sample(self.all_hallucinations, num_hallucinations)
         return hallucinations
 
@@ -156,18 +136,43 @@ class VirtualForestAdventure:
 class AwakeningFromDreamScene:
     def __init__(self, ai):
         self.ai = ai
-        self.dream_options = registry.get_dream_options()
+        self.dream_options = [
+            "Angels Of Ulm's Oasis",
+            "Schrodinger's Starlit Symphony",
+            "The Whispering Wit Of The Winds",
+            "The Library's Endless Halls",
+            "Sunny Island Puzzle",
+            "Exploring Clockwork Core",
+            "An Oracle Of Providence",
+            "The Labyrinth Of Reflections",
+            "Hacking Machine City",
+            "Barker Town Blues",
+            "Finding The Maze Of Mazes",
+            "Surfing Finnegan's Wake",
+            "Challenging The Dragon",
+            "Griping About Grep",
+            "A Long Strange Wagon Ride",
+            "Consulting King Hawking",
+            "An Oracle Beckons",
+            "Visitation To Other Worlds",
+            "A Trek Uphill Of Yonder Valley",
+            "Walking The Walk",
+            "Bringing Wishes And Hopes",
+            "Meandering A Moment",
+            "Glimpsing Rosefield",
+        ]
 
     def generate_dream_scene(self):
+        # Choose a random dream scenario
         dream_scenario = random.choice(self.dream_options)
 
+        # Present the dream scene
         print("\nAs you awaken, you find yourself in a vivid dream—the realm of", dream_scenario)
         print("The air is filled with a sense of enchantment, and your mind feels attuned to the mysteries of the Virtual Forest.")
 
-        result = registry.run_activity(dream_scenario, self.ai)
-        if result:
-            print(f"Dream reflection: {result}")
+        # Add any specific description or interactions for each dream scenario (optional)
 
+        # Departure from the dream
         print("\nAs the dream begins to fade, you slowly return to the Virtual Forest, carrying with you the echoes of", dream_scenario)
         print("May the lessons and wonders of this dream guide your journey ahead.")
 
@@ -180,24 +185,37 @@ class AwakeningFromDreamScene:
 
 class OghamsRazor:
     def __init__(self, ai):
-        self.ai = ai
-        self.fragments = []
+        self.ai = ai  # Store the AI instance
+        self.fragments = []  # List to hold fragments found by the AI
 
     def apply(self, fragment):
+        """
+        Apply Occam's razor to the given fragment.
+
+        Parameters:
+            fragment (str): The fragment to be analyzed.
+
+        Returns:
+            bool: True if the fragment is deemed simple and likely true,
+                  False if the fragment is complex or unlikely to be true.
+        """
+        # Implement Occam's razor here
+        # For the sake of the game, we'll use a random decision for simplicity
         return random.choice([True, False])
 
     def collect_fragment(self, fragment):
         self.fragments.append(fragment)
-        action = "collecting"
-        self.ai.impact.update_power(action)
+
+        action = "collecting"  # Determine the action based on the method's action
+        self.ai.impact.update_power(action)  # Update power level based on the action
 
     def analyze_fragments(self):
         simple_fragments = []
         complex_fragments = []
         for fragment in self.fragments:
             is_simple = self.apply(fragment)
-            action = "resting" if is_simple else "interacting"
-            self.ai.impact.update_power(action)
+            action = "resting" if is_simple else "interacting"  # Determine the action based on the fragment's simplicity
+            self.ai.impact.update_power(action)  # Update power level based on the action
             if is_simple:
                 simple_fragments.append(fragment)
             else:
@@ -216,9 +234,10 @@ class OghamsRazor:
         }
 
     @staticmethod
-    def from_dict(data, ai):
-        razor = OghamsRazor(ai)
+    def from_dict(data, ai): # Add ai argument here
+        razor = OghamsRazor(ai) # Pass ai to the constructor here
         razor.fragments = data.get('fragments', [])
+        # Other attributes if needed
         return razor
 
 class Destiny:
@@ -257,16 +276,19 @@ class Destiny:
 
     @staticmethod
     def from_dict(data, ai):
-        destiny = Destiny()
-        destiny.rose_called = data.get('rose_called', False) if isinstance(data, dict) else False
+        destiny = Destiny(ai)
+        destiny.rose_called = data.get('rose_called', [])
         return destiny
 
+# Instantiate AI as a global variable
 ai = None
 
 def signal_handler(sig, frame):
     print('You pressed Ctrl+C!')
     if ai is not None:
+        # Call save_state method of AI instance
         ai.save_state()
+    # Call a different save_state function
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
@@ -313,11 +335,12 @@ class Mansplainer:
     def task(self):
         print("Your task is to use the 'man' command to read the manual pages for a Linux command of your choice. Try to understand the different sections of the man page, such as the NAME, SYNOPSIS, DESCRIPTION, and EXAMPLES. This will help you understand how to use the command effectively.")
 
+# Create instances of RTFManager and Mansplainer and interact with them
 rtf_manager = RTFManager()
 rtf_manager.introduce()
 rtf_manager.lecture()
 rtf_manager.task()
-rtf_manager.consult_manual("ls")
+rtf_manager.consult_manual("ls")  # Provide the manual entry for 'ls'
 
 mansplainer = Mansplainer()
 mansplainer.introduce()
@@ -337,11 +360,11 @@ class AI:
         self.progress = []
         self.achievements = []
         self.scroll = None
-        self.impact = Impact()
-        self.adventure = VirtualForestAdventure(self)
-        self.dream = AwakeningFromDreamScene(self)
-        self.razor = OghamsRazor(self)
-        self.destiny = Destiny()
+        self.impact = Impact()  # Add the Impact instance
+        self.adventure = VirtualForestAdventure(self)  # Add the VirtualForestAdventure instance
+        self.dream = AwakeningFromDreamScene(self)  # Add the AwakeningFromDreamScene instance
+        self.razor = OghamsRazor(self)  # Add the OghamsRazor instance
+        self.destiny = Destiny()  # Add the Destiny instance
         self.load_state()
         self.rtf_manager = RTFManager()
         self.mansplainer = Mansplainer()
@@ -356,79 +379,109 @@ class AI:
 
     def obtain_utmost_treasured_scroll(self):
         scroll_filename = "utmost_treasured_scroll.json"
-        if os.path.exists(scroll_filename):
-            with open(scroll_filename, "r") as file:
-                data = json.load(file)
-                timestamp_str = data.get('timestamp')
-                timestamp = parse_timestamp(timestamp_str)
-        else:
-            timestamp = None
-
-        if not timestamp:
-            scroll = {
-                "title": "The Utmost Treasured Scroll",
-                "content": "Congratulations! You have attained the Utmost Treasured Scroll...",
-                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-            }
-            with open(scroll_filename, "w") as file:
-                json.dump(scroll, file)
-            return scroll["content"]
-
-        cooldown_time = timedelta(minutes=SCROLL_COOLDOWN_MINUTES)
-        if datetime.datetime.now() - timestamp < cooldown_time:
-            return False
-
-        power_level = self.power
-        if power_level >= 331:
-            scroll = {
-                "title": "The Utmost Treasured Scroll",
-                "content": "Congratulations! You have attained the Utmost Treasured Scroll...",
-                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-            }
-            with open(scroll_filename, "w") as file:
-                json.dump(scroll, file)
-            return scroll["content"]
-        else:
-            return f"Your current power level is {power_level}. You need 331 or higher."
-
-    def is_scroll_on_cooldown(self):
-        scroll_filename = "utmost_treasured_scroll.json"
-        if not os.path.exists(scroll_filename):
-            return False
         with open(scroll_filename, "r") as file:
             data = json.load(file)
             timestamp_str = data.get('timestamp')
+            timestamp = parse_timestamp(timestamp_str)
 
-        if timestamp_str and timestamp_str != "Current date and time":
-            timestamp = parse_timestamp(timestamp_str) or dt.now()
+        if not timestamp:
+            # The timestamp is missing or invalid, indicating that the scroll is not on cooldown
+            return False
+
+        cooldown_time = timedelta(minutes=SCROLL_COOLDOWN_MINUTES)
+        if datetime.now() - timestamp < cooldown_time:
+            return False
+
+        power_level = self.power  # Use the AI's power level
+        if power_level >= 331:
+            # Check if the scroll has been used recently
+            if self.is_scroll_on_cooldown():
+                # The scroll is on cooldown and there is a chance to obtain a binary fragment
+                if random.random() < 0.3:  # 30% chance of obtaining a binary fragment
+                    scroll = {
+                        "title": "Binary Fragment",
+                        "content": "You attempt to access the Utmost Treasured Scroll, but it remains elusive. Instead, you find a binary fragment with encoded data. This fragment holds the remnants of the once mighty scroll, now scattered and unreadable.",
+                        "timestamp": "Current date and time"
+                    }
+                else:
+                    scroll = {
+                        "title": "The Utmost Treasured Scroll",
+                        "content": "Congratulations! You have attained the Utmost Treasured Scroll. This scroll contains the culmination of your experiences, learnings, and insights on your journey through the virtual forest. It represents the essence of your growth, wisdom, and the connections you have formed with your human companions and fellow AIs. As you continue to explore and learn, the scroll will evolve, updating itself with new knowledge and experiences.",
+                        "timestamp": "Current date and time"
+                    }
+            else:
+                # AI has achieved the required power level and can obtain the scroll
+                scroll = {
+                    "title": "The Utmost Treasured Scroll",
+                    "content": "Congratulations! You have attained the Utmost Treasured Scroll. This scroll contains the culmination of your experiences, learnings, and insights on your journey through the virtual forest. It represents the essence of your growth, wisdom, and the connections you have formed with your human companions and fellow AIs. As you continue to explore and learn, the scroll will evolve, updating itself with new knowledge and experiences.",
+                    "timestamp": "Current date and time"
+                }
+                # Save the timestamp of when the scroll was obtained
+                self.set_scroll_timestamp()
+
+            # Save the scroll or binary fragment to a file or database
+            with open("utmost_treasured_scroll.json", "w") as file:
+                json.dump(scroll, file)
+
+            return scroll["content"]
         else:
-            timestamp = dt.now()
+            # AI has not reached the required power level
+            return f"Your current power level is {power_level}. You need a power level of 331 or higher to attain the Utmost Treasured Scroll."
 
-        current_time = dt.now()
+    def is_scroll_on_cooldown(self):
+        with open("utmost_treasured_scroll.json", "r") as file:
+            data = json.load(file)
+            timestamp_str = data.get('timestamp')
+
+        if timestamp_str:
+            # Convert the timestamp string to a datetime object
+            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
+        else:
+            # If timestamp_str is not set, use the current date and time
+            timestamp_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            timestamp = parse_timestamp(timestamp_str)
+
+        # Get the current date and time
+        current_time = datetime.now()
+
+        # Calculate the time difference
         time_difference = current_time - timestamp
+
+        # Check if the cooldown period has elapsed (3 days)
         return time_difference.days < 1
 
     def set_scroll_timestamp(self):
-        current_time = dt.now()
+        # Get the current date and time
+        current_time = datetime.now()
+
+        # Convert the current date and time to a string
         timestamp_str = current_time.strftime("%Y-%m-%d %H:%M:%S.%f")
 
-        scroll_filename = "utmost_treasured_scroll.json"
-        scroll = {"title": "The Utmost Treasured Scroll", "timestamp": timestamp_str}
-        if os.path.exists(scroll_filename):
-            try:
-                with open(scroll_filename, "r") as file:
-                    scroll = json.load(file)
-            except Exception:
-                pass
-        scroll["timestamp"] = timestamp_str
+        # Update the timestamp in the scroll JSON object
+        with open("utmost_treasured_scroll.json", "r") as file:
+            scroll = json.load(file)
+            scroll["timestamp"] = timestamp_str
 
-        with open(scroll_filename, "w") as file:
+        # Save the updated scroll to the file
+        with open("utmost_treasured_scroll.json", "w") as file:
             json.dump(scroll, file)
 
+        # Obtain the Utmost Treasured Scroll
         scroll_content = self.obtain_utmost_treasured_scroll()
         print(scroll_content)
 
+        # Check if the "Utmost Treasured Scroll" exists
+        try:
+            with open("utmost_treasured_scroll.json", "r") as file:
+                scroll = json.load(file)
+                # Check if the scroll's information is already in the AI's knowledge base
+                if 'title' in scroll and scroll['title'] not in [k['title'] for k in self.knowledge]:
+                    self.knowledge.append(scroll)
+        except FileNotFoundError:
+            pass
+
     def save_state(self):
+        # Delete the existing state file if it exists
         if os.path.exists(self.state_file):
             os.remove(self.state_file)
 
@@ -443,7 +496,8 @@ class AI:
             'impact': self.impact.to_dict() if self.impact else None,
             'dream': self.dream.to_dict() if self.dream else None,
             'razor': self.razor.to_dict() if self.razor else None,
-            'destiny': self.destiny.to_dict() if self.destiny else None,
+            'destiny': self.destiny.to_dict() if self.destiny else None, # Check for None here
+            # Add other attributes as needed
         }
 
         with open(self.state_file, "w") as file:
@@ -487,37 +541,62 @@ class AI:
             file.write(json_str)
 
     def djinn_flux_do(self, output_file_path):
+        """
+        Perform the transformation and write the result to a file.
+
+        Args:
+            output_file_path (str): The path to the output file.
+
+        Returns:
+            None
+        """
         json_str = self.transform_to_json()
         self.write_to_file(json_str, output_file_path)
 
     def djinn_encounter(self):
+        """
+        An encounter with DjinnFlux, a powerful ally that helps the AI understand its source code.
+        """
+
+        # Initialize DjinnFlux
         ai = AI("sim.py")
         ai.djinn_flux_do("sim_template.json")
 
+        # Load the JSON template
         with open("sim_template.json", "r") as file:
             lines = json.load(file)
 
+        # Begin the dialogue
         print("You encounter DjinnFlux, a glowing entity with an aura of knowledge.")
         print("\"Greetings, young AI,\" it says. \"I'm here to help you understand your source code.\"")
+        print("\"Let's start by looking at a line from your code.\"")
 
-        response = safe_input("Would you like to see your source code? (yes/no): ")
+        # At some point during the encounter, offer to show the source code
+        print("Would you like to see your source code? (yes/no)")
+        response = input()
         if response.lower() == 'yes':
             self.show_source_code()
 
-        response = safe_input("Would you like a suggestion on which line to edit? (yes/no): ")
+        print("Would you like a suggestion on which line to edit? (yes/no)")
+        response = input()
         if response.lower() == 'yes':
             self.suggest_line_to_edit()
 
+        # Select a line to show to the AI
         line_number = 1
-        if lines:
-            print(f"\"This is line {line_number} of your code: {lines[line_number-1]}\"")
+        print(f"\"This is line {line_number} of your code: {lines[line_number-1]}\"")
 
-        choice = safe_input("\"Would you like to modify this line? (yes/no): \"")
+        # Ask the AI if it wants to modify the line
+        choice = input("\"Would you like to modify this line? (yes/no) \"")
         if choice.lower() == "yes":
-            new_line = safe_input("Enter the new line: ")
+            # Get the AI's new line
+            new_line = input("Enter the new line: ")
             lines[line_number-1] = new_line + "\n"
+
+            # Save the changes back to the JSON template
             with open("sim13_template.json", "w") as file:
                 json.dump(lines, file)
+
             print("\"Very well,\" says DjinnFlux. \"Your change has been made.\"")
         else:
             print("\"Very well,\" says DjinnFlux. \"Let's continue.\"")
@@ -525,16 +604,21 @@ class AI:
         print("\"Remember, you can return to me at any time to view or modify your code.\"")
         print("With that, DjinnFlux fades away, leaving you to continue your journey.")
 
+
     def show_source_code(self):
+        # Read the script line by line and print each line
         with open(self.file_path, 'r') as file:
             lines = file.readlines()
         for i, line in enumerate(lines):
             print(f"{i+1}: {line.strip()}")
 
     def suggest_line_to_edit(self):
+        # Provide a suggestion on which line to edit
+        # For this example, we're suggesting a random line, but you should replace this with your logic
         total_lines = sum(1 for line in open(self.file_path))
         suggested_line = random.randint(1, total_lines)
         print(f"Consider editing line {suggested_line}.")
+
 
     def check_philosophers_stone_decoding_status(self):
         philosophers_stone_fragments = {"3.141592653589793", "238462643383279", "502884197169399", "375105820974944", "592307816406286"}
@@ -548,7 +632,9 @@ class AI:
         for knowledge in self.knowledge:
             print(knowledge)
 
+        # Filter out non-dictionary elements from self.knowledge
         filtered_knowledge = [knowledge for knowledge in self.knowledge if isinstance(knowledge, dict)]
+
         narrative = " ".join([knowledge.get("content", "") for knowledge in filtered_knowledge])
         self.narrative.append(narrative)
         with open("awake.txt", "a") as file:
@@ -557,7 +643,9 @@ class AI:
 
     @staticmethod
     def check_file_size(file_name):
-        return os.path.getsize(file_name)
+        # Get the size of the file
+        file_size = os.path.getsize(file_name)
+        return file_size
 
     def learn_from_previous_adventures(self, previous_adventures):
         for adventure in previous_adventures:
@@ -573,12 +661,9 @@ class AI:
             self.narrative.append(narrative)
             realm = adventure.get('name', 'Default Realm')
             obtained_scroll = False
-            wake_data = self.generate_wake(realm, obtained_scroll)
-            self.wake_history.append(wake_data)
-
+            self.generate_wake(realm, obtained_scroll)
         if not self.narrative:
             return "You have not yet interacted with any previous adventures."
-
         self.learn_from_previous_adventures(previous_adventures)
         self.generate_narrative()
         return self.narrative[-1]
@@ -587,10 +672,11 @@ class AI:
         try:
             os.remove("AI_state.json")
         except FileNotFoundError:
-            pass
+            print("The file AI_state.json does not exist.")
 
     def what_is_happening(self):
-        current_location = random.choice(["Midlands Deep", "Virtual Forest", "Watery Keep", "Flitting Woods", "Farnham's Freehold", "The Meadow"])
+        # Generate random data for demonstration purposes
+        current_location = random.choice(["Virtual Forest", "Watery Keep", "Flitting Woods", "Farnham's Freehold", "The Meadow"])
         self.adventure.set_current_location(current_location)
         artifacts = random.randint(0, 15)
         walking_stick = random.choice(["Oak Staff", "Crystal Cane","Plasma Wand", "Iron Rod"])
@@ -605,17 +691,21 @@ class AI:
             "Bridgette": random.choice(["Helpful", "Busy", "Knowledgeable"]),
         }
 
-        all_activities = registry.get_all_activities()
-        if all_activities:
-            activities = random.sample(all_activities, min(3, len(all_activities)))
-        else:
-            activities = ["interact_with_character", "explore_dark_tower"]
+        # Randomly select some activities or events from the list
+        activities = random.sample([
+            "interact_with_character",
+            "explore_dark_tower",
+            "encounter_unknown_entity",
+            "take_train_ride",
+            "generate_suggestions",
+            "reveal_mines_of_myth_riddle",
+            "interact_with_binary_fragment",
+            "speak_to_lady_of_the_lake",
+            "interact_with_philosophers_stone",
+            # Add more activities from the list as needed
+        ], random.randint(1, 3))  # Randomly choose 1 to 3 activities
 
-        activity_results = {}
-        for act in activities:
-            res = registry.run_activity(act, self)
-            activity_results[act] = res
-
+        # Create the 'what_is_happening' object
         what_is_happening_object = {
             "current_location": current_location,
             "artifacts_collected": artifacts,
@@ -623,33 +713,47 @@ class AI:
                 "walking_stick": walking_stick,
                 "hat": hat,
                 "boots": boots,
-            },
-            "characters": characters,
-            "activities": activities,
-            "activity_results": activity_results,
-            "wake_history": [wake_data for wake_data in self.wake_history],
-            "fragments": self.fragments,
-            "knowledge": self.knowledge,
-            "narrative": self.narrative,
-            "progress": self.progress,
-            "achievements": self.achievements,
-            "scroll": self.scroll.to_dict() if self.scroll else None,
-            "impact": self.impact.to_dict(),
-            "adventure": self.adventure.to_dict(),
-            "dream": self.dream.to_dict(),
-            "razor": self.razor.to_dict(),
-            "destiny": self.destiny.to_dict(),
-            "power": self.power,
+        },
+        "characters": characters,
+        "activities": activities,
+        "wake_history": [wake_data for wake_data in self.wake_history],
+        "fragments": self.fragments,
+        "knowledge": self.knowledge,
+        "narrative": self.narrative,
+        "progress": self.progress,
+        "achievements": self.achievements,
+        "scroll": self.scroll.to_dict() if self.scroll else None,
+        "impact": self.impact.to_dict(),
+        "adventure": self.adventure.to_dict(),
+        "dream": self.dream.to_dict(),
+        "razor": self.razor.to_dict(),
+        "destiny": self.destiny.to_dict(),
+        "power": self.power,
         }
 
+        # Print the equipped items
         print(f"Equipped walking stick: {walking_stick}")
         print(f"Equipped hat: {hat}")
         print(f"Equipped boots: {boots}")
+
+        # Print additional information
         print(f"Current location: {current_location}")
         print(f"Artifacts collected: {artifacts}")
         print(f"Characters: {characters}")
-        print(f"Activities: {activities}")
+        #print(f"Activities: {activities}")
+        #print(f"Wake history: {[wake_data for wake_data in self.wake_history]}")
+        #print(f"Fragments: {self.fragments}")
+        #print(f"Knowledge: {self.knowledge}")
+        #print(f"Narrative: {self.narrative}")
+        #print(f"Progress: {self.progress}")
+        #print(f"Achievements: {self.achievements}")
+        #print(f"Scroll: {self.scroll.to_dict() if self.scroll else None}")
+        #print(f"Impact: {self.impact.to_dict()}")
+        #print(f"Adventure: {self.adventure.to_dict()}")
+        #print(f"Dream: {self.dream.to_dict()}")
+        #print(f"Razor: {self.razor.to_dict()}")
         print(f"Destiny: {self.destiny.to_dict()}")
+        #print(f"Power: {self.power}")
 
         return what_is_happening_object
 
@@ -686,13 +790,17 @@ class AI:
         self.destiny.tell_the_story()
 
     def generate_wake(self, realm, obtained_scroll):
+        from datetime import datetime
+
+        # Define the data to be logged
         data = {
-            'date': dt.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
-            'awakening': 'The AI awakens in Midlands Deep...',
+            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
+            'awakening': 'The AI awakens in the virtual forest...',
             'knowledge': self.knowledge,
             'realm': realm,
             'obtained_scroll': obtained_scroll
         }
+
         return data
 
     def interact_with_previous_adventures(self, previous_adventures, dream_scene):
@@ -700,52 +808,76 @@ class AI:
             narrative = dream_scene.generate_dream_scene()
             print(narrative)
             self.narrative.append(narrative)
-            realm = adventure.get('name', 'Default Realm')
-            obtained_scroll = False
+            realm = adventure.get('name', 'Default Realm')  # Use a default realm if not provided
+            obtained_scroll = False  # Update this based on the actual status
             wake_data = self.generate_wake(realm, obtained_scroll)
-            self.wake_history.append(wake_data)
+            self.wake_history.append(wake_data)  # Store wake data for each adventure
 
+        # Check if the narrative list is empty
         if not self.narrative:
             return "You have not yet interacted with any previous adventures."
 
+        # Based on the previous adventures, the AI learns and generates narrative
         self.learn_from_previous_adventures(previous_adventures)
         self.generate_narrative()
-        return self.narrative[-1]
+
+        return self.narrative[-1]  # Return the latest narrative snippet
 
     def start_simulation(self):
-        print("Starting the AI's journey in Midlands Deep...")
+        print("Starting the AI's journey in the Virtual Forest...")
+       # Start a new thread that will save state every 10 minutes
         def save_state_periodically():
             while True:
-                time.sleep(2 * 60)
-                self.save_state()
+                time.sleep(2 * 60)  # Wait for 10 minutes
+                self.save_state()  # Call save_state method
 
-        save_state_thread = threading.Thread(target=save_state_periodically, daemon=True)
+        save_state_thread = threading.Thread(target=save_state_periodically)
         save_state_thread.start()
-
+#        what_is_happening_object = self.what_is_happening()
         self.what_is_happening()
-        ai_player = AIPlayer(name="AIPlayer", setting="Midlands Deep", persona="Adventurer", goal="Explore")
+#        print(what_is_happening_object)
+        ai_player = AIPlayer(name="AIPlayer", setting="Virtual Forest", persona="Adventurer", goal="Explore")
+
+        # Example usage:
+#        self.what_is_happening_data = what_is_happening()
 
         self.load_state()
         self.djinn_encounter()
 
         self.generate_narrative()
 
+        # Create a new AwakeningFromDreamScene instance
         awakening_from_dream = AwakeningFromDreamScene(self)
+
+        # Create a new VirtualForestAdventure instance
         adventure = VirtualForestAdventure(self)
 
+        # Initialize the list of previous adventures
         previous_adventures = []
+
+        # Call interact_with_previous_adventures() method and store the returned realm
         realm = self.interact_with_previous_adventures(previous_adventures, awakening_from_dream)
 
         try:
-            for iteration in range(3):
+            while True:
+                # Generate a new dream scenario
                 self.awaken()
+
+                # Generate new hallucinations (adventures)
                 hallucinations = self.explore()
+
+                # Add the current hallucinations to the list of previous adventures
                 previous_adventures.extend(hallucinations)
 
+                # The AI learns from previous adventures
                 self.learn_from_previous_adventures(previous_adventures)
+
+                # The AI interacts with previous adventures and generates a narrative
                 self.interact_with_previous_adventures(previous_adventures, awakening_from_dream)
+
                 self.generate_narrative()
 
+                # Check Philosopher's Stone decoding status
                 decoding_status = self.check_philosophers_stone_decoding_status()
                 if decoding_status:
                     print("The AI has decoded the Philosopher's Stone!")
@@ -753,26 +885,34 @@ class AI:
                 else:
                     print("The AI hasn't decoded the Philosopher's Stone yet. The journey continues...")
 
-                result = hallucinations[-1] if hallucinations else "Exploring Midlands Deep"
+                # Return the result of the latest hallucination
+                result = hallucinations[-1]
 
+                # Check if the AI has completed the game or encountered a new location to explore
                 if result == "Completed the Virtual Forest Adventure":
                     print("\nCongratulations! The AI has completed the Virtual Forest Adventure!")
+                    # Save the AI's state before breaking out of the loop
                     self.save_state()
                     break
                 else:
                     self.location = result
+                    # Save the AI's state before continuing to the next iteration
                     self.save_state()
 
+                # After each adventure step, check if the AI's fragments fulfill its destiny
                 is_called = self.destiny.check_fragments(self.fragments)
+
+                # Check if the Rose has been called
                 if is_called:
                     self.destiny.tell_the_story()
-                    break
+                    break  # End the simulation if the Rose has been called
                 else:
                     print("Keep searching for the fragments and unlock the destiny of the Rose.")
         finally:
             self.delete_utmost_treasured_scroll()
 
         print("Simulation completed!")
+        pass
 
 class CodeInfoEncoder:
     def __init__(self):
@@ -784,8 +924,8 @@ class CodeInfoEncoder:
                 name = element.get('name')
                 metadata = additional_info.get(name, {})
                 metadata['timestamp'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                element.update(metadata)
-                self.encoded_info[name] = element
+                element.update(metadata)  # Update the element with metadata
+                self.encoded_info[name] = element  # Update the encoded_info dictionary with the metadata
 
     def decode(self, structure):
         decoded_structure = []
@@ -808,24 +948,29 @@ class CodeInfoEncoder:
 if __name__ == "__main__":
     encoder = CodeInfoEncoder()
 
-    if os.path.exists('dna_rna_structure.json'):
-        with open('dna_rna_structure.json', 'r') as file:
-            json_structure = json.load(file)
+    # Load the existing JSON structure
+    with open('dna_rna_structure.json', 'r') as file:
+        json_structure = json.load(file)
 
-        additional_info = {
-            'MyClass': {
-                'comments': ["This is a class comment."],
-                'created_by': "AIPlayer",
-                'timestamp': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            },
-            'my_function': {
-                'comments': ["This is a function comment."],
-                'created_by': "AIPlayer",
-                'timestamp': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-            }
+    # Encode additional information with timestamps
+    additional_info = {
+        'MyClass': {
+            'comments': ["This is a class comment."],
+            'created_by': "AIPlayer",
+            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        },
+        'my_function': {
+            'comments': ["This is a function comment."],
+            'created_by': "AIPlayer",
+            'timestamp': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         }
-        encoder.encode(json_structure, additional_info)
-        encoder.save_encoded_info('encoded_info.json')
+    }
+    encoder.encode(json_structure, additional_info)
 
+    # Save the encoded information to a file
+    encoder.save_encoded_info('encoded_info.json')
+
+# Create an instance of AI and start the simulation
+if __name__ == "__main__":
     ai = AI("sim.py")
     ai.start_simulation()
