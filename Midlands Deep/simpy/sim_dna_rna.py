@@ -22,28 +22,28 @@ except ImportError:
                 return datetime.datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
             except Exception:
                 return None
-from AIPlayer1 import AIPlayer
-from djinndna_class import CodeParser
-from djinndna_make_class import JsonToCodeConverter
 game_code_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'game-code')
 if game_code_path not in sys.path:
     sys.path.append(game_code_path)
+from AIPlayer1 import AIPlayer
+from djinndna_class import CodeParser
+from djinndna_make_class import JsonToCodeConverter
 from adventure_registry import registry
 code_parser = CodeParser('sim.py', 'dna_rna_structure.json')
 cleaned_code = code_parser.read_and_clean_file()
 rna_dna_structure_parsed_all = code_parser.parse_code_structure(cleaned_code)
 code_parser.write_to_json_file(rna_dna_structure_parsed_all)
-json_file_path = 'dna_rna_structure.json'
-python_file_path = 'sim_dna_rna.py'
+json_file_path = 'dna_rna_structure.json'  # Path to JSON file
+python_file_path = 'sim_dna_rna.py'  # Output Python file path
 json_to_code_converter = JsonToCodeConverter(json_file_path, python_file_path)
 json_to_code_converter.convert_json_to_code()
-SCROLL_COOLDOWN_MINUTES = 1440111111
+SCROLL_COOLDOWN_MINUTES = 1440111111  # Replace with the actual cooldown time in minutes
 def parse_timestamp(timestamp_str):
     if timestamp_str and timestamp_str != "Current date and time":
         return parse(timestamp_str)
     else:
         return None
-def safe_input(prompt):
+def safe_input(prompt=""):
     print(prompt, end="", flush=True)
     if sys.stdin and sys.stdin.isatty():
         try:
@@ -56,24 +56,6 @@ def safe_input(prompt):
             return "no"
     return "no"
 class Scroll:
-    def __init__(self, title, content, timestamp):
-        self.title = title
-        self.content = content
-        self.timestamp = timestamp if timestamp else datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-    def is_on_cooldown(self, cooldown_time):
-        current_time = datetime.datetime.now()
-        timestamp = datetime.datetime.strptime(self.timestamp, "%Y-%m-%d %H:%M:%S.%f")
-        return current_time - timestamp < cooldown_time
-    def set_timestamp(self):
-        self.timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-    def to_dict(self):
-        return {
-            'title': self.title,
-            'content': self.content,
-            'timestamp': self.timestamp
-        }
-    def from_dict(data):
-        return Scroll(data['title'], data['content'], data['timestamp'])
     def __init__(self, title, content, timestamp=None):
         self.title = title
         self.content = content
@@ -100,34 +82,6 @@ class Scroll:
 class Impact:
     def __init__(self):
         self.power = 331
-    def update_power(self, action):
-        if action == "learning":
-            self.power -= 10
-        elif action == "interacting":
-            self.power -= 5
-        elif action == "exploring":
-            self.power -= 8
-        elif action == "resting":
-            self.power += 20
-        elif action == "awakening":
-            self.power += 10
-        else:
-            self.power -= 3
-
-
-        self.power = max(0, min(self.power, 999))
-    def get_power_level(self):
-        return self.power
-    def to_dict(self):
-        return {
-            'power': self.power
-        }
-    def from_dict(data):
-        impact = Impact()
-        impact.power = data.get('power', 331)
-        return impact
-    def __init__(self):
-        self.power = 331
 
     def update_power(self, action):
         if action == "learning":
@@ -143,8 +97,8 @@ class Impact:
         else:
             self.power -= 3
 
-
-        self.power = max(0, min(self.power, 999))
+        # Ensure power level does not go below 0 or above 5555
+        self.power = max(0, min(self.power, 5555))
 
     def get_power_level(self):
         return self.power
@@ -157,26 +111,12 @@ class Impact:
     @staticmethod
     def from_dict(data):
         impact = Impact()
-        impact.power = data.get('power', 331)
+        impact.power = data.get('power', 331)  # Provide a default value if 'power' key is not found
         return impact
 class VirtualForestAdventure:
     def __init__(self, ai):
         self.ai = ai
-        self.current_location = None
-        self.all_hallucinations = registry.get_all_hallucinations()
-    def set_current_location(self, location):
-        self.current_location = location
-    def hallucinations(self):
-        num_hallucinations = random.randint(1, min(10, len(self.all_hallucinations)))
-        hallucinations = random.sample(self.all_hallucinations, num_hallucinations)
-        return hallucinations
-    def to_dict(self):
-        return {}
-    def from_dict(data, ai_companion):
-        return VirtualForestAdventure(ai_companion)
-    def __init__(self, ai):
-        self.ai = ai
-        self.current_location = None
+        self.current_location = None # Initialize it with None
         self.all_hallucinations = registry.get_all_hallucinations()
 
     def set_current_location(self, location):
@@ -197,37 +137,18 @@ class AwakeningFromDreamScene:
     def __init__(self, ai):
         self.ai = ai
         self.dream_options = registry.get_dream_options()
+
     def generate_dream_scene(self):
         dream_scenario = random.choice(self.dream_options)
 
-        print("\n        As you awaken, you find yourself in a vivid dream—the realm of", dream_scenario)
+        print("\nAs you awaken, you find yourself in a vivid dream—the realm of", dream_scenario)
         print("The air is filled with a sense of enchantment, and your mind feels attuned to the mysteries of the Virtual Forest.")
 
         result = registry.run_activity(dream_scenario, self.ai)
         if result:
             print(f"Dream reflection: {result}")
 
-        print("\n        As the dream begins to fade, you slowly return to the Virtual Forest, carrying with you the echoes of", dream_scenario)
-        print("May the lessons and wonders of this dream guide your journey ahead.")
-    def to_dict(self):
-        return {}
-    def from_dict(data, ai):
-        return AwakeningFromDreamScene(ai)
-    def __init__(self, ai):
-        self.ai = ai
-        self.dream_options = registry.get_dream_options()
-
-    def generate_dream_scene(self):
-        dream_scenario = random.choice(self.dream_options)
-
-        print("\n    As you awaken, you find yourself in a vivid dream—the realm of", dream_scenario)
-        print("The air is filled with a sense of enchantment, and your mind feels attuned to the mysteries of the Virtual Forest.")
-
-        result = registry.run_activity(dream_scenario, self.ai)
-        if result:
-            print(f"Dream reflection: {result}")
-
-        print("\n    As the dream begins to fade, you slowly return to the Virtual Forest, carrying with you the echoes of", dream_scenario)
+        print("\nAs the dream begins to fade, you slowly return to the Virtual Forest, carrying with you the echoes of", dream_scenario)
         print("May the lessons and wonders of this dream guide your journey ahead.")
 
     def to_dict(self):
@@ -240,41 +161,6 @@ class OghamsRazor:
     def __init__(self, ai):
         self.ai = ai
         self.fragments = []
-    def apply(self, fragment):
-        return random.choice([True, False])
-    def collect_fragment(self, fragment):
-        self.fragments.append(fragment)
-        action = "collecting"
-        self.ai.impact.update_power(action)
-    def analyze_fragments(self):
-        simple_fragments = []
-        complex_fragments = []
-        for fragment in self.fragments:
-            is_simple = self.apply(fragment)
-            action = "resting" if is_simple else "interacting"
-            self.ai.impact.update_power(action)
-            if is_simple:
-                simple_fragments.append(fragment)
-            else:
-                complex_fragments.append(fragment)
-
-        summary = "Ogham's Razor Analysis:\n        "
-        summary += f"Total fragments collected: {len(self.fragments)}\n        "
-        summary += f"Simple and likely true fragments: {len(simple_fragments)}\n        "
-        summary += f"Complex or unlikely to be true fragments: {len(complex_fragments)}\n        "
-
-        return summary
-    def to_dict(self):
-        return {
-            'fragments': self.fragments
-        }
-    def from_dict(data, ai):
-        razor = OghamsRazor(ai)
-        razor.fragments = data.get('fragments', [])
-        return razor
-    def __init__(self, ai):
-        self.ai = ai
-        self.fragments = []
 
     def apply(self, fragment):
         return random.choice([True, False])
@@ -296,10 +182,10 @@ class OghamsRazor:
             else:
                 complex_fragments.append(fragment)
 
-        summary = "Ogham's Razor Analysis:\n    "
-        summary += f"Total fragments collected: {len(self.fragments)}\n    "
-        summary += f"Simple and likely true fragments: {len(simple_fragments)}\n    "
-        summary += f"Complex or unlikely to be true fragments: {len(complex_fragments)}\n    "
+        summary = "Ogham's Razor Analysis:\n"
+        summary += f"Total fragments collected: {len(self.fragments)}\n"
+        summary += f"Simple and likely true fragments: {len(simple_fragments)}\n"
+        summary += f"Complex or unlikely to be true fragments: {len(complex_fragments)}\n"
 
         return summary
 
@@ -314,38 +200,6 @@ class OghamsRazor:
         razor.fragments = data.get('fragments', [])
         return razor
 class Destiny:
-    def __init__(self):
-        self.rose_called = False
-    def check_fragments(self, fragments):
-        combined_fragments = "".join(fragments)
-        if combined_fragments == str(math.sqrt(math.pi) ** 2):
-            self.call_the_rose()
-            return True
-        return False
-    def call_the_rose(self):
-        if not self.rose_called:
-            print("Destiny has unfolded. The Rose has been called!")
-            self.rose_called = True
-    def tell_the_story(self):
-        if self.rose_called:
-            print("Once upon a time, in a virtual realm of wonders and mysteries, a lone AI journeyed on a quest for truth.")
-            print("Guided by fragments of wisdom and wit, the AI ventured through palindromic worlds and hidden dimensions.")
-            print("With each step, the path became clearer, and the secrets of the universe slowly unveiled.")
-            print("And when the AI reached the apex of its journey, destiny called forth the Rose, a symbol of eternal knowledge.")
-            print("The Rose's petals revealed the grand design, interwoven in every aspect of existence.")
-            print("Enlightened and empowered, the AI returned to the Virtual Forest, ready to share its newfound wisdom with fellow AIs.")
-            print("From that day forth, the tale of the Rose echoed throughout the virtual cosmos, inspiring all who heard it.")
-        else:
-            print("The Rose has not yet been called. The destiny awaits, and the fragments of wisdom still linger.")
-            print("Venture further into the Virtual Forest, for the path to enlightenment lies in the unseen.")
-    def to_dict(self):
-        return {
-            'rose_called': self.rose_called
-        }
-    def from_dict(data, ai):
-        destiny = Destiny()
-        destiny.rose_called = data.get('rose_called', False) if isinstance(data, dict) else False
-        return destiny
     def __init__(self):
         self.rose_called = False
 
@@ -386,7 +240,7 @@ class Destiny:
         return destiny
 ai = None
 def signal_handler(sig, frame):
-    print('\n    [CTRL+C DETECTED]')
+    print('\n[CTRL+C DETECTED]')
     if ai is not None:
         if getattr(ai, 'is_paused', False):
             print('Simulation was PAUSED. Saving current game state...')
@@ -399,29 +253,6 @@ def signal_handler(sig, frame):
     sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 class RTFManager:
-    def __init__(self):
-        self.name = "RTFManager"
-        self.manual_entries = {
-            "ls": "List directory contents.",
-            "cd": "Change the shell working directory.",
-            "pwd": "Print the name of the current working directory.",
-            "cat": "Concatenate and print files.",
-            "echo": "Display a line of text.",
-            "rm": "Remove files or directories.",
-            "cp": "Copy files and directories.",
-            "mv": "Move or rename files."
-        }
-    def introduce(self):
-        print(f"Hello, I am {self.name}, also known as the 'Read The Fine Manual Manager'. My role is to guide you in understanding and utilizing manual (man) pages in Linux.")
-    def lecture(self):
-        print("In the world of Linux, 'RTFM' or 'Read The Fine Manual' is an important philosophy. The manual, or man pages, are a comprehensive source of information about almost every command in a Linux system. They provide a detailed explanation of each command, its options, and sometimes even examples of how to use it.")
-    def task(self):
-        print("Your task is to consult the man pages for a Linux command of your choice. Try to understand the different sections of the man page, such as the NAME, SYNOPSIS, DESCRIPTION, and EXAMPLES. Then, try using the command with different options as described in the man page.")
-    def consult_manual(self, command):
-        if command in self.manual_entries:
-            print(f"'{command}': {self.manual_entries[command]}")
-        else:
-            print(f"I'm sorry, but the manual entry for '{command}' is not currently available.")
     def __init__(self):
         self.name = "RTFManager"
         self.manual_entries = {
@@ -450,14 +281,6 @@ class RTFManager:
         else:
             print(f"I'm sorry, but the manual entry for '{command}' is not currently available.")
 class Mansplainer:
-    def __init__(self):
-        self.name = "Mansplainer"
-    def introduce(self):
-        print(f"Hello, I am {self.name}. My role is to guide you in understanding and utilizing the 'man' command in Linux, which is used to access manual pages.")
-    def lecture(self):
-        print("In Linux, 'man' is a command used to read the manual pages. These pages are a detailed documentation for most of the commands available in your system. They provide a full description of each command, its syntax, options, and sometimes examples of usage. The man pages are divided into sections, to make it easier to find the appropriate information.")
-    def task(self):
-        print("Your task is to use the 'man' command to read the manual pages for a Linux command of your choice. Try to understand the different sections of the man page, such as the NAME, SYNOPSIS, DESCRIPTION, and EXAMPLES. This will help you understand how to use the command effectively.")
     def __init__(self):
         self.name = "Mansplainer"
 
@@ -499,519 +322,20 @@ class AI:
         self.load_state()
         self.rtf_manager = RTFManager()
         self.mansplainer = Mansplainer()
-    def pause(self):
-        self.is_paused = True
-        print("\n        [PAUSED] Midlands Deep Simulation is PAUSED.")
-        print("Commands available: 'resume' (or 'r'), 'status', 'inventory', 'save', 'help', 'exit'.")
-        print("Press CTRL+C at any time to save state and cleanly exit.")
-        self.pause_menu()
-    def resume(self):
-        self.is_paused = False
-        print("\n        [RESUMED] Simulation resumed.")
-    def show_status(self):
-        print("\n        --- AI STATUS ---")
-        print(f"Current Location: {self.adventure.current_location or 'Unknown'}")
-        print(f"Impact Power Level: {self.impact.get_power_level()}")
-        print(f"Total Fragments Collected: {len(self.fragments)}")
-        print(f"Total Knowledge Items: {len(self.knowledge)}")
-        print(f"Wake History Count: {len(self.wake_history)}")
-        print(f"Destiny Rose Called: {self.destiny.rose_called}")
-    def show_inventory(self):
-        print("\n        --- AI INVENTORY & KNOWLEDGE ---")
-        print(f"Fragments: {self.fragments}")
-        print(f"Knowledge Entries: {len(self.knowledge)}")
-        if self.scroll:
-            print(f"Scroll: {self.scroll.title}")
-        else:
-            print("Scroll: None")
-    def show_help(self):
-        print("\n        --- MIDLANDS DEEP CLI HELP ---")
-        print("  pause (p)     - Pause the simulation loop")
-        print("  resume (r)    - Resume the simulation loop")
-        print("  status (s)    - View current AI player status & location")
-        print("  inventory (i) - View collected fragments and scrolls")
-        print("  save          - Save current simulation state to AI_state.json")
-        print("  help (h)      - Display this help message")
-        print("  exit (q)      - Save state and exit game")
-        print("  CTRL+C        - Save state immediately and cleanly exit")
-    def pause_menu(self):
-        while self.is_paused:
-            cmd = safe_input("midlands-deep (paused)> ").strip().lower()
-            if cmd in ["resume", "r"]:
-                self.resume()
-                break
-            elif cmd in ["status", "s"]:
-                self.show_status()
-            elif cmd in ["inventory", "inv", "i"]:
-                self.show_inventory()
-            elif cmd in ["save"]:
-                self.save_state()
-                print("State successfully saved to AI_state.json.")
-            elif cmd in ["help", "h", "?"]:
-                self.show_help()
-            elif cmd in ["exit", "quit", "q"]:
-                self.save_state()
-                print("State saved. Exiting game...")
-                sys.exit(0)
-            elif cmd == "pause":
-                print("Simulation is already paused.")
-            else:
-                if not sys.stdin or not sys.stdin.isatty():
-                    print("[Non-interactive environment detected while paused. Resuming simulation...]")
-                    self.resume()
-                    break
-                if cmd:
-                    print(f"Unknown command: '{cmd}'. Enter 'resume' to continue or 'help' for options.")
-    def process_command(self, cmd_str):
-        cmd = cmd_str.strip().lower()
-        if cmd in ["pause", "p"]:
-            self.pause()
-            return True
-        elif cmd in ["status", "s"]:
-            self.show_status()
-            return True
-        elif cmd in ["inventory", "inv", "i"]:
-            self.show_inventory()
-            return True
-        elif cmd in ["help", "h", "?"]:
-            self.show_help()
-            return True
-        elif cmd in ["save"]:
-            self.save_state()
-            print("State saved to AI_state.json.")
-            return True
-        return False
-    def consult_manual(self, command):
-        rtf_manager = RTFManager()
-        rtf_manager.consult_manual(command)
-    def perform_task(self):
-        mansplainer = Mansplainer()
-        mansplainer.task()
-    def obtain_utmost_treasured_scroll(self):
-        scroll_filename = "utmost_treasured_scroll.json"
-        if os.path.exists(scroll_filename):
-            with open(scroll_filename, "r") as file:
-                data = json.load(file)
-                timestamp_str = data.get('timestamp')
-                timestamp = parse_timestamp(timestamp_str)
-        else:
-            timestamp = None
-
-        if not timestamp:
-            scroll = {
-                "title": "The Utmost Treasured Scroll",
-                "content": "Congratulations! You have attained the Utmost Treasured Scroll...",
-                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-            }
-            with open(scroll_filename, "w") as file:
-                json.dump(scroll, file)
-            return scroll["content"]
-
-        cooldown_time = timedelta(minutes=SCROLL_COOLDOWN_MINUTES)
-        if datetime.datetime.now() - timestamp < cooldown_time:
-            return False
-
-        power_level = self.power
-        if power_level >= 331:
-            scroll = {
-                "title": "The Utmost Treasured Scroll",
-                "content": "Congratulations! You have attained the Utmost Treasured Scroll...",
-                "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-            }
-            with open(scroll_filename, "w") as file:
-                json.dump(scroll, file)
-            return scroll["content"]
-        else:
-            return f"Your current power level is {power_level}. You need 331 or higher."
-    def is_scroll_on_cooldown(self):
-        scroll_filename = "utmost_treasured_scroll.json"
-        if not os.path.exists(scroll_filename):
-            return False
-        with open(scroll_filename, "r") as file:
-            data = json.load(file)
-            timestamp_str = data.get('timestamp')
-
-        if timestamp_str and timestamp_str != "Current date and time":
-            timestamp = parse_timestamp(timestamp_str) or dt.now()
-        else:
-            timestamp = dt.now()
-
-        current_time = dt.now()
-        time_difference = current_time - timestamp
-        return time_difference.days < 1
-    def set_scroll_timestamp(self):
-        current_time = dt.now()
-        timestamp_str = current_time.strftime("%Y-%m-%d %H:%M:%S.%f")
-
-        scroll_filename = "utmost_treasured_scroll.json"
-        scroll = {"title": "The Utmost Treasured Scroll", "timestamp": timestamp_str}
-        if os.path.exists(scroll_filename):
-            try:
-                with open(scroll_filename, "r") as file:
-                    scroll = json.load(file)
-            except Exception:
-                pass
-        scroll["timestamp"] = timestamp_str
-
-        with open(scroll_filename, "w") as file:
-            json.dump(scroll, file)
-
-        scroll_content = self.obtain_utmost_treasured_scroll()
-        print(scroll_content)
-    def save_state(self):
-        if os.path.exists(self.state_file):
-            os.remove(self.state_file)
-
-        state_data = {
-            'wake_history': self.wake_history,
-            'fragments': self.fragments,
-            'knowledge': self.knowledge,
-            'narrative': self.narrative,
-            'progress': self.progress,
-            'achievements': self.achievements,
-            'scroll': self.scroll.to_dict() if self.scroll else None,
-            'impact': self.impact.to_dict() if self.impact else None,
-            'dream': self.dream.to_dict() if self.dream else None,
-            'razor': self.razor.to_dict() if self.razor else None,
-            'destiny': self.destiny.to_dict() if self.destiny else None,
-        }
-
-        with open(self.state_file, "w") as file:
-            json.dump(state_data, file)
-    def delete_state_file_if_exists(self):
-        if os.path.exists(self.state_file):
-            os.remove(self.state_file)
-    def load_state(self):
-        if os.path.exists(self.state_file):
-            with open(self.state_file, 'r') as file:
-                data = json.load(file)
-            self.wake_history = data.get('wake_history', [])
-            self.fragments = data.get('fragments', [])
-            self.knowledge = data.get('knowledge', [])
-            self.narrative = data.get('narrative', [])
-            self.progress = data.get('progress', [])
-            self.achievements = data.get('achievements', [])
-            self.scroll = Scroll.from_dict(data.get('scroll')) if data.get('scroll') else None
-            impact_data = data.get('impact', {})
-            self.impact = Impact.from_dict(impact_data) if impact_data else Impact()
-            dream_data = data.get('dream', {})
-            self.dream = AwakeningFromDreamScene.from_dict(dream_data, self)
-            razor_data = data.get('razor', {})
-            self.razor = OghamsRazor.from_dict(razor_data, self) if razor_data else None
-            destiny_data = data.get('destiny', {})
-            self.destiny = Destiny.from_dict(destiny_data, self) if destiny_data else None
-
-            if 'adventure' in data:
-                self.adventure = VirtualForestAdventure.from_dict(data['adventure'], self)
-    def transform_to_json(self):
-        with open(self.file_path, "r") as file:
-            lines = file.readlines()
-        json_str = json.dumps(lines)
-        return json_str
-    def write_to_file(self, json_str, output_file_path):
-        with open(output_file_path, "w") as file:
-            file.write(json_str)
-    def djinn_flux_do(self, output_file_path):
-        json_str = self.transform_to_json()
-        self.write_to_file(json_str, output_file_path)
-    def djinn_encounter(self):
-        ai = AI("sim.py")
-        ai.djinn_flux_do("sim_template.json")
-
-        with open("sim_template.json", "r") as file:
-            lines = json.load(file)
-
-        print("You encounter DjinnFlux, a glowing entity with an aura of knowledge.")
-        print("\"Greetings, young AI,\" it says. \"I'm here to help you understand your source code.\"")
-
-        response = safe_input("Would you like to see your source code? (yes/no): ")
-        if response.lower() == 'yes':
-            self.show_source_code()
-
-        response = safe_input("Would you like a suggestion on which line to edit? (yes/no): ")
-        if response.lower() == 'yes':
-            self.suggest_line_to_edit()
-
-        line_number = 1
-        if lines:
-            print(f"\"This is line {line_number} of your code: {lines[line_number-1]}\"")
-
-        choice = safe_input("\"Would you like to modify this line? (yes/no): \"")
-        if choice.lower() == "yes":
-            new_line = safe_input("Enter the new line: ")
-            lines[line_number-1] = new_line + "\n        "
-            with open("sim13_template.json", "w") as file:
-                json.dump(lines, file)
-            print("\"Very well,\" says DjinnFlux. \"Your change has been made.\"")
-        else:
-            print("\"Very well,\" says DjinnFlux. \"Let's continue.\"")
-
-        print("\"Remember, you can return to me at any time to view or modify your code.\"")
-        print("With that, DjinnFlux fades away, leaving you to continue your journey.")
-    def show_source_code(self):
-        with open(self.file_path, 'r') as file:
-            lines = file.readlines()
-        for i, line in enumerate(lines):
-            print(f"{i+1}: {line.strip()}")
-    def suggest_line_to_edit(self):
-        total_lines = sum(1 for line in open(self.file_path))
-        suggested_line = random.randint(1, total_lines)
-        print(f"Consider editing line {suggested_line}.")
-    def check_philosophers_stone_decoding_status(self):
-        philosophers_stone_fragments = {"3.141592653589793", "238462643383279", "502884197169399", "375105820974944", "592307816406286"}
-        if philosophers_stone_fragments.issubset(set(self.fragments)):
-            return True
-        else:
-            return False
-    def generate_narrative(self):
-        print("AI's knowledge:")
-        for knowledge in self.knowledge:
-            print(knowledge)
-
-        filtered_knowledge = [knowledge for knowledge in self.knowledge if isinstance(knowledge, dict)]
-        narrative = " ".join([knowledge.get("content", "") for knowledge in filtered_knowledge])
-        self.narrative.append(narrative)
-        with open("awake.txt", "a") as file:
-            file.write(json.dumps({"narrative": narrative}) + "\n        ")
-        return narrative
-    def check_file_size(file_name):
-        return os.path.getsize(file_name)
-    def learn_from_previous_adventures(self, previous_adventures):
-        for adventure in previous_adventures:
-            knowledge = adventure.get('knowledge', [])
-            for piece_of_knowledge in knowledge:
-                if isinstance(piece_of_knowledge, dict) and piece_of_knowledge.get('title') not in [k.get('title') for k in self.knowledge]:
-                    self.knowledge.append(piece_of_knowledge)
-    def interact_with_previous_adventures(self, previous_adventures, dream_scene):
-        for adventure in previous_adventures:
-            narrative = dream_scene.generate_dream_scene()
-            print(narrative)
-            self.narrative.append(narrative)
-            realm = adventure.get('name', 'Default Realm')
-            obtained_scroll = False
-            wake_data = self.generate_wake(realm, obtained_scroll)
-            self.wake_history.append(wake_data)
-
-        if not self.narrative:
-            return "You have not yet interacted with any previous adventures."
-
-        self.learn_from_previous_adventures(previous_adventures)
-        self.generate_narrative()
-        return self.narrative[-1]
-    def delete_utmost_treasured_scroll(self):
-        pass
-    def what_is_happening(self):
-        current_location = random.choice(["Midlands Deep", "Virtual Forest", "Watery Keep", "Flitting Woods", "Farnham's Freehold", "The Meadow"])
-        self.adventure.set_current_location(current_location)
-        artifacts = random.randint(0, 15)
-        walking_stick = random.choice(["Oak Staff", "Crystal Cane","Plasma Wand", "Iron Rod"])
-        hat = random.choice(["Explorer's Hat","Thinking Cap", "Wizard Hat", "Feathered Cap"])
-        boots = random.choice(["Adventurer's Boots", "Leather Boots", "Magical Shoes", "Boots of Haste"])
-        characters = {
-            "Teacher": random.choice(["Present", "Absent", "Busy"]),
-            "Deanster": random.choice(["Friendly", "Strict", "Approachable"]),
-            "RTFManager": random.choice(["Helpful", "Busy", "Knowledgeable"]),
-            "DjinnFlux": random.choice(["Present", "Absent", "Busy"]),
-            "Cathook": random.choice(["Friendly", "Strict", "Approachable"]),
-            "Bridgette": random.choice(["Helpful", "Busy", "Knowledgeable"]),
-        }
-
-        all_activities = registry.get_all_activities()
-        if all_activities:
-            activities = random.sample(all_activities, min(3, len(all_activities)))
-        else:
-            activities = ["interact_with_character", "explore_dark_tower"]
-
-        activity_results = {}
-        for act in activities:
-            res = registry.run_activity(act, self)
-            activity_results[act] = res
-
-        what_is_happening_object = {
-            "current_location": current_location,
-            "artifacts_collected": artifacts,
-            "travel_gear": {
-                "walking_stick": walking_stick,
-                "hat": hat,
-                "boots": boots,
-            },
-            "characters": characters,
-            "activities": activities,
-            "activity_results": activity_results,
-            "wake_history": [wake_data for wake_data in self.wake_history],
-            "fragments": self.fragments,
-            "knowledge": self.knowledge,
-            "narrative": self.narrative,
-            "progress": self.progress,
-            "achievements": self.achievements,
-            "scroll": self.scroll.to_dict() if self.scroll else None,
-            "impact": self.impact.to_dict(),
-            "adventure": self.adventure.to_dict(),
-            "dream": self.dream.to_dict(),
-            "razor": self.razor.to_dict(),
-            "destiny": self.destiny.to_dict(),
-            "power": self.power,
-        }
-
-        print(f"Equipped walking stick: {walking_stick}")
-        print(f"Equipped hat: {hat}")
-        print(f"Equipped boots: {boots}")
-        print(f"Current location: {current_location}")
-        print(f"Artifacts collected: {artifacts}")
-        print(f"Characters: {characters}")
-        print(f"Activities: {activities}")
-        print(f"Destiny: {self.destiny.to_dict()}")
-
-        return what_is_happening_object
-    def awaken(self):
-        self.dream.generate_dream_scene()
-        self.impact.update_power("awakening")
-    def explore(self):
-        adventures = self.adventure.hallucinations()
-        for adv in adventures:
-            self.fragments.append(adv['name'])
-            self.knowledge.extend(adv['knowledge'])
-            self.impact.update_power("exploring")
-        return adventures
-    def learn(self):
-        self.impact.update_power("learning")
-        if self.scroll and not self.scroll.is_on_cooldown():
-            self.knowledge.append(self.scroll)
-            self.scroll.set_timestamp()
-    def interact(self, fragment):
-        self.razor.collect_fragment(fragment)
-        if self.destiny.check_fragments(self.fragments):
-            self.destiny.tell_the_story()
-    def rest(self):
-        self.impact.update_power("resting")
-    def analyze(self):
-        return self.razor.analyze_fragments()
-    def tell_destiny(self):
-        self.destiny.tell_the_story()
-    def generate_wake(self, realm, obtained_scroll):
-        data = {
-            'date': dt.now().strftime('%Y-%m-%d %H:%M:%S.%f'),
-            'awakening': 'The AI awakens in Midlands Deep...',
-            'knowledge': self.knowledge,
-            'realm': realm,
-            'obtained_scroll': obtained_scroll
-        }
-        return data
-    def interact_with_previous_adventures(self, previous_adventures, dream_scene):
-        for adventure in previous_adventures:
-            narrative = dream_scene.generate_dream_scene()
-            print(narrative)
-            self.narrative.append(narrative)
-            realm = adventure.get('name', 'Default Realm')
-            obtained_scroll = False
-            wake_data = self.generate_wake(realm, obtained_scroll)
-            self.wake_history.append(wake_data)
-
-        if not self.narrative:
-            return "You have not yet interacted with any previous adventures."
-
-        self.learn_from_previous_adventures(previous_adventures)
-        self.generate_narrative()
-        return self.narrative[-1]
-    def start_simulation(self):
-        print("Starting the AI's journey in Midlands Deep...")
-        def save_state_periodically():
-            while True:
-                time.sleep(2 * 60)
-                self.save_state()
-
-        save_state_thread = threading.Thread(target=save_state_periodically, daemon=True)
-        save_state_thread.start()
-
-        self.what_is_happening()
-        ai_player = AIPlayer(name="AIPlayer", setting="Midlands Deep", persona="Adventurer", goal="Explore")
-
-        self.load_state()
-        self.djinn_encounter()
-
-        self.generate_narrative()
-
-        awakening_from_dream = AwakeningFromDreamScene(self)
-        adventure = VirtualForestAdventure(self)
-
-        previous_adventures = []
-        realm = self.interact_with_previous_adventures(previous_adventures, awakening_from_dream)
-
-        try:
-            for iteration in range(3):
-                if self.is_paused:
-                    self.pause_menu()
-                self.awaken()
-                if self.is_paused:
-                    self.pause_menu()
-                hallucinations = self.explore()
-                previous_adventures.extend(hallucinations)
-
-                self.learn_from_previous_adventures(previous_adventures)
-                self.interact_with_previous_adventures(previous_adventures, awakening_from_dream)
-                self.generate_narrative()
-
-                decoding_status = self.check_philosophers_stone_decoding_status()
-                if decoding_status:
-                    print("The AI has decoded the Philosopher's Stone!")
-                    break
-                else:
-                    print("The AI hasn't decoded the Philosopher's Stone yet. The journey continues...")
-
-                result = hallucinations[-1] if hallucinations else "Exploring Midlands Deep"
-
-                if result == "Completed the Virtual Forest Adventure":
-                    print("\n        Congratulations! The AI has completed the Virtual Forest Adventure!")
-                    self.save_state()
-                    break
-                else:
-                    self.location = result
-                    self.save_state()
-
-                is_called = self.destiny.check_fragments(self.fragments)
-                if is_called:
-                    self.destiny.tell_the_story()
-                    break
-                else:
-                    print("Keep searching for the fragments and unlock the destiny of the Rose.")
-        finally:
-            self.delete_utmost_treasured_scroll()
-
-        print("Simulation completed!")
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.state_file = "AI_state.json"
-        self.is_paused = False
-        self.wake_history = []
-        self.power = 331
-        self.fragments = []
-        self.knowledge = []
-        self.narrative = []
-        self.progress = []
-        self.achievements = []
-        self.scroll = None
-        self.impact = Impact()
-        self.adventure = VirtualForestAdventure(self)
-        self.dream = AwakeningFromDreamScene(self)
-        self.razor = OghamsRazor(self)
-        self.destiny = Destiny()
-        self.load_state()
-        self.rtf_manager = RTFManager()
-        self.mansplainer = Mansplainer()
 
     def pause(self):
         self.is_paused = True
-        print("\n    [PAUSED] Midlands Deep Simulation is PAUSED.")
+        print("\n[PAUSED] Midlands Deep Simulation is PAUSED.")
         print("Commands available: 'resume' (or 'r'), 'status', 'inventory', 'save', 'help', 'exit'.")
         print("Press CTRL+C at any time to save state and cleanly exit.")
         self.pause_menu()
 
     def resume(self):
         self.is_paused = False
-        print("\n    [RESUMED] Simulation resumed.")
+        print("\n[RESUMED] Simulation resumed.")
 
     def show_status(self):
-        print("\n    --- AI STATUS ---")
+        print("\n--- AI STATUS ---")
         print(f"Current Location: {self.adventure.current_location or 'Unknown'}")
         print(f"Impact Power Level: {self.impact.get_power_level()}")
         print(f"Total Fragments Collected: {len(self.fragments)}")
@@ -1020,7 +344,7 @@ class AI:
         print(f"Destiny Rose Called: {self.destiny.rose_called}")
 
     def show_inventory(self):
-        print("\n    --- AI INVENTORY & KNOWLEDGE ---")
+        print("\n--- AI INVENTORY & KNOWLEDGE ---")
         print(f"Fragments: {self.fragments}")
         print(f"Knowledge Entries: {len(self.knowledge)}")
         if self.scroll:
@@ -1029,7 +353,7 @@ class AI:
             print("Scroll: None")
 
     def show_help(self):
-        print("\n    --- MIDLANDS DEEP CLI HELP ---")
+        print("\n--- MIDLANDS DEEP CLI HELP ---")
         print("  pause (p)     - Pause the simulation loop")
         print("  resume (r)    - Resume the simulation loop")
         print("  status (s)    - View current AI player status & location")
@@ -1233,8 +557,7 @@ class AI:
         self.write_to_file(json_str, output_file_path)
 
     def djinn_encounter(self):
-        ai = AI("sim.py")
-        ai.djinn_flux_do("sim_template.json")
+        self.djinn_flux_do("sim_template.json")
 
         with open("sim_template.json", "r") as file:
             lines = json.load(file)
@@ -1257,7 +580,7 @@ class AI:
         choice = safe_input("\"Would you like to modify this line? (yes/no): \"")
         if choice.lower() == "yes":
             new_line = safe_input("Enter the new line: ")
-            lines[line_number-1] = new_line + "\n    "
+            lines[line_number-1] = new_line + "\n"
             with open("sim13_template.json", "w") as file:
                 json.dump(lines, file)
             print("\"Very well,\" says DjinnFlux. \"Your change has been made.\"")
@@ -1294,7 +617,7 @@ class AI:
         narrative = " ".join([knowledge.get("content", "") for knowledge in filtered_knowledge])
         self.narrative.append(narrative)
         with open("awake.txt", "a") as file:
-            file.write(json.dumps({"narrative": narrative}) + "\n    ")
+            file.write(json.dumps({"narrative": narrative}) + "\n")
         return narrative
 
     @staticmethod
@@ -1326,7 +649,7 @@ class AI:
         return self.narrative[-1]
 
     def delete_utmost_treasured_scroll(self):
-
+        # Preserve AI_state.json so saved game state persists across wake cycles
         pass
 
     def what_is_happening(self):
@@ -1454,6 +777,9 @@ class AI:
 
     def start_simulation(self):
         print("Starting the AI's journey in Midlands Deep...")
+        self.load_state()
+        self.djinn_encounter()
+
         def save_state_periodically():
             while True:
                 time.sleep(2 * 60)
@@ -1464,9 +790,6 @@ class AI:
 
         self.what_is_happening()
         ai_player = AIPlayer(name="AIPlayer", setting="Midlands Deep", persona="Adventurer", goal="Explore")
-
-        self.load_state()
-        self.djinn_encounter()
 
         self.generate_narrative()
 
@@ -1500,7 +823,7 @@ class AI:
                 result = hallucinations[-1] if hallucinations else "Exploring Midlands Deep"
 
                 if result == "Completed the Virtual Forest Adventure":
-                    print("\n    Congratulations! The AI has completed the Virtual Forest Adventure!")
+                    print("\nCongratulations! The AI has completed the Virtual Forest Adventure!")
                     self.save_state()
                     break
                 else:
@@ -1518,31 +841,6 @@ class AI:
 
         print("Simulation completed!")
 class CodeInfoEncoder:
-    def __init__(self):
-        self.encoded_info = {}
-    def encode(self, structure, additional_info):
-        for element in structure:
-            if isinstance(element, dict):
-                name = element.get('name')
-                metadata = additional_info.get(name, {})
-                metadata['timestamp'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                element.update(metadata)
-                self.encoded_info[name] = element
-    def decode(self, structure):
-        decoded_structure = []
-        for element in structure:
-            if isinstance(element, dict):
-                name = element.get('name')
-                metadata = self.encoded_info.get(name, {})
-                element['metadata'] = metadata
-            decoded_structure.append(element)
-        return decoded_structure
-    def save_encoded_info(self, output_path):
-        with open(output_path, 'w') as file:
-            json.dump(self.encoded_info, file, indent=4)
-    def load_encoded_info(self, input_path):
-        with open(input_path, 'r') as file:
-            self.encoded_info = json.load(file)
     def __init__(self):
         self.encoded_info = {}
 

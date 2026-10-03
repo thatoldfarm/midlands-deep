@@ -13,18 +13,11 @@ class JsonToCodeConverter:
         code_lines = []
         for element in structure:
             if isinstance(element, dict):
-                if element['type'] == 'function':
-                    code_lines.append("    " * indentation_level + f"def {element['name']}({', '.join(element['parameters'])}):")
-                    body_indentation = element['body'].replace('\\n', '\\n' + "    " * (indentation_level + 1))
-                    code_lines.append("    " * (indentation_level + 1) + f"{body_indentation}")
-                elif element['type'] == 'class':
-                    code_lines.append("    " * indentation_level + f"class {element['name']}:")
-                    code_lines.extend(self.parse_json_structure(element['methods'], indentation_level + 1))
-                    body_indentation = element['body'].replace('\\n', '\\n' + "    " * (indentation_level + 1))
-                    code_lines.append("    " * (indentation_level + 1) + f"{body_indentation}")
-            else:
-                # Handle raw code lines and preserve blank lines
-                code_lines.extend(["    " * indentation_level + line for line in element.split('\\n')])
+                body = element.get('body', '')
+                if body:
+                    code_lines.append(body)
+            elif isinstance(element, str):
+                code_lines.append(element)
         return code_lines
 
     def write_to_python_file(self, code_lines):

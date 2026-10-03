@@ -85,8 +85,8 @@ class Impact:
         else:
             self.power -= 3
 
-        # Ensure power level does not go below 0 or above 999
-        self.power = max(0, min(self.power, 999))
+        # Ensure power level does not go below 0 or above 5555
+        self.power = max(0, min(self.power, 5555))
 
     def get_power_level(self):
         return self.power
@@ -559,8 +559,7 @@ class AI:
         """
 
         # Initialize DjinnFlux
-        ai = AI("sim.py")
-        ai.djinn_flux_do("sim_template.json")
+        self.djinn_flux_do("sim_template.json")
 
         # Load the JSON template
         with open("sim_template.json", "r") as file:
@@ -825,13 +824,16 @@ class AI:
 
     def start_simulation(self):
         print("Starting the AI's journey in the Virtual Forest...")
+        self.load_state()
+        self.djinn_encounter()
+
        # Start a new thread that will save state every 10 minutes
         def save_state_periodically():
             while True:
                 time.sleep(2 * 60)  # Wait for 10 minutes
                 self.save_state()  # Call save_state method
 
-        save_state_thread = threading.Thread(target=save_state_periodically)
+        save_state_thread = threading.Thread(target=save_state_periodically, daemon=True)
         save_state_thread.start()
 #        what_is_happening_object = self.what_is_happening()
         self.what_is_happening()
@@ -840,9 +842,6 @@ class AI:
 
         # Example usage:
 #        self.what_is_happening_data = what_is_happening()
-
-        self.load_state()
-        self.djinn_encounter()
 
         self.generate_narrative()
 
