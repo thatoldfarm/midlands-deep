@@ -1,14 +1,23 @@
 
-def fetch_directory_structure():
-    with open("directory_structure.json", "r") as json_file:
-        directory_structure = json.load(json_file)
-    return directory_structure
-# Requires entry-point script like sim.py
-import openai
+import os
+import json
 import random
 import time
-import json
-import os
+
+try:
+    import openai
+except ImportError:
+    openai = None
+
+def fetch_directory_structure():
+    dir_struct_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "directory_structure.json")
+    if os.path.exists(dir_struct_file):
+        with open(dir_struct_file, "r") as json_file:
+            return json.load(json_file)
+    elif os.path.exists("directory_structure.json"):
+        with open("directory_structure.json", "r") as json_file:
+            return json.load(json_file)
+    return {}
 
 # ChatGPTModel class for handling interactions with ChatGPT
 class ChatGPTModel:
@@ -18,10 +27,13 @@ class ChatGPTModel:
 
     def set_account(self):
         # Set OpenAI API credentials here
-        openai_api_key = "YOUR_API_KEY"
-        openai.api_key = openai_api_key
+        if openai is not None:
+            openai_api_key = "YOUR_API_KEY"
+            openai.api_key = openai_api_key
 
     def generate_response(self, messages, **decoding_params):
+        if openai is None:
+            return "ChatGPT integration is unavailable because 'openai' package is not installed."
         response = openai.ChatCompletion.create(
             model=self.model_name,
             messages=messages,
