@@ -22,8 +22,14 @@ from djinndna_make_class import JsonToCodeConverter
 class TestMidlandsDeep(unittest.TestCase):
 
     def setUp(self):
+        if os.path.exists("AI_state.json"):
+            os.remove("AI_state.json")
         self.ai = sim.AI('sim.py')
         sim.ai = self.ai
+
+    def tearDown(self):
+        if os.path.exists("AI_state.json"):
+            os.remove("AI_state.json")
 
     def test_ai_initialization(self):
         self.assertIsNotNone(self.ai)
@@ -73,6 +79,51 @@ class TestMidlandsDeep(unittest.TestCase):
         self.ai.is_paused = True
         # Verify signal_handler function exists and sets state saving
         self.assertTrue(callable(sim.signal_handler))
+
+    def test_kernel_manager_and_cognition(self):
+        km = self.ai.kernel_manager
+        self.assertIsNotNone(km.default_kernel)
+        self.assertEqual(km.default_kernel.filename, "OMNI-CORE_SINGULARITY_ABSOLUTE_v4.json")
+        self.assertTrue(len(km.supplement_kernels) >= 2)
+        self.assertIsNotNone(km.active_kernel)
+        self.assertEqual(km.active_kernel.filename, "mega_json_quine_v15_43.json")
+
+        self.assertIn("EDAULC", km.personas)
+        self.assertIn("SOULFIRE", km.personas)
+        self.assertIn("Jacob-Source", km.personas)
+
+        # Test adopting persona
+        adopted = self.ai.adopt_persona("SOULFIRE")
+        self.assertTrue(adopted)
+        self.assertEqual(self.ai.active_persona, "SOULFIRE")
+
+        # Test cognitive operator
+        res = self.ai.execute_cognition("Λ", "Test Concept")
+        self.assertIn("[COGNITION] Executed Λ", res)
+
+        # Test MUD room inspection and Pi Opcode / AdS/CFT routing
+        room_data = self.ai.mud_inspect_room(0)
+        opcode_info = km.lookup_pi_opcode(0)
+        self.assertIsNotNone(opcode_info)
+        self.assertEqual(opcode_info["room_index"], 0)
+
+        corridor_info = km.route_ads_cft_corridor(0)
+        self.assertEqual(corridor_info["2D_boundary_room"], "SHADOW_ROOM_00")
+
+        # Test CLI commands for kernels & cognition
+        self.assertTrue(self.ai.process_command("kernels"))
+        self.assertTrue(self.ai.process_command("adopt EDAULC"))
+        self.assertEqual(self.ai.active_persona, "EDAULC")
+        self.assertTrue(self.ai.process_command("mud 5"))
+        self.assertEqual(self.ai.mud_current_room_idx, 5)
+        self.assertTrue(self.ai.process_command("cognition Φ Synthesis"))
+        self.assertTrue(self.ai.process_command("vista"))
+
+        # Test state persistence with kernel attributes
+        self.ai.save_state()
+        reloaded_ai = sim.AI('sim.py')
+        self.assertEqual(reloaded_ai.active_persona, "EDAULC")
+        self.assertEqual(reloaded_ai.mud_current_room_idx, 5)
 
 if __name__ == "__main__":
     unittest.main()
